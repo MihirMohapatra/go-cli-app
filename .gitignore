@@ -1,0 +1,13 @@
+# Binaries
+bin/
+*.exe
+*.test
+
+# Go workspace files
+go.work
+go.work.sum
+
+# Local environment
+.env
+.vscode/
+.idea/
