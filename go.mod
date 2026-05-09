@@ -1,3 +1,3 @@
-module github.com/your-username/go-language-app
+module github.com/MihirMohapatra/go-cli-app
 
 go 1.22

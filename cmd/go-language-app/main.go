@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/your-username/go-language-app/internal/greeting"
+	"github.com/MihirMohapatra/go-cli-app/internal/greeting"
 )
 
 func main() {
