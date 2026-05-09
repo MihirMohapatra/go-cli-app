@@ -1,6 +1,6 @@
-# Go Language App
+# Go CLI App
 
-A small Go command-line application starter.
+A small Go HTTP API that exposes CRUD endpoints for an in-memory todo list.
 
 ## Prerequisites
 
@@ -10,7 +10,62 @@ A small Go command-line application starter.
 ## Run
 
 ```powershell
-go run ./cmd/go-language-app -name Mihir
+go run ./cmd/go-language-app
+```
+
+The API starts on `http://localhost:8080`.
+
+To use another port:
+
+```powershell
+go run ./cmd/go-language-app -port 9090
+```
+
+## Endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| GET | `/health` | Check API health |
+| GET | `/todos` | List all todos |
+| POST | `/todos` | Create a todo |
+| GET | `/todos/{id}` | Get one todo |
+| PUT | `/todos/{id}` | Update one todo |
+| DELETE | `/todos/{id}` | Delete one todo |
+
+## Examples
+
+Create a todo:
+
+```powershell
+curl.exe -X POST http://localhost:8080/todos `
+  -H "Content-Type: application/json" `
+  -d "{\"title\":\"Learn Go\"}"
+```
+
+List todos:
+
+```powershell
+curl.exe http://localhost:8080/todos
+```
+
+Get one todo:
+
+```powershell
+curl.exe http://localhost:8080/todos/1
+```
+
+Update a todo:
+
+```powershell
+curl.exe -X PUT http://localhost:8080/todos/1 `
+  -H "Content-Type: application/json" `
+  -d "{\"title\":\"Learn Go\",\"completed\":true}"
+```
+
+Delete a todo:
+
+```powershell
+curl.exe -X DELETE http://localhost:8080/todos/1
 ```
 
 ## Test
@@ -23,14 +78,4 @@ go test ./...
 
 ```powershell
 go build -o bin/go-language-app.exe ./cmd/go-language-app
-```
-
-## Push To GitHub
-
-Create an empty GitHub repository, then run:
-
-```powershell
-git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
-git branch -M main
-git push -u origin main
 ```
