@@ -1,11 +1,15 @@
 package todos
 
-import "testing"
+import (
+	"context"
+	"testing"
+)
 
 func TestStoreCRUD(t *testing.T) {
-	store := NewStore()
+	ctx := context.Background()
+	store := NewMemoryStore()
 
-	created, err := store.Create("Learn Go")
+	created, err := store.Create(ctx, "Learn Go")
 	if err != nil {
 		t.Fatalf("Create returned error: %v", err)
 	}
@@ -13,15 +17,15 @@ func TestStoreCRUD(t *testing.T) {
 		t.Fatalf("Create ID = %d, want 1", created.ID)
 	}
 
-	got, ok := store.Get(created.ID)
-	if !ok {
-		t.Fatal("Get could not find created todo")
+	got, err := store.Get(ctx, created.ID)
+	if err != nil {
+		t.Fatalf("Get returned error: %v", err)
 	}
 	if got.Title != "Learn Go" || got.Completed {
 		t.Fatalf("Get = %+v, want title Learn Go and completed false", got)
 	}
 
-	updated, err := store.Update(created.ID, "Ship API", true)
+	updated, err := store.Update(ctx, created.ID, "Ship API", true)
 	if err != nil {
 		t.Fatalf("Update returned error: %v", err)
 	}
@@ -29,18 +33,18 @@ func TestStoreCRUD(t *testing.T) {
 		t.Fatalf("Update = %+v, want title Ship API and completed true", updated)
 	}
 
-	if !store.Delete(created.ID) {
-		t.Fatal("Delete returned false for existing todo")
+	if err := store.Delete(ctx, created.ID); err != nil {
+		t.Fatalf("Delete returned error: %v", err)
 	}
-	if _, ok := store.Get(created.ID); ok {
-		t.Fatal("Get found deleted todo")
+	if _, err := store.Get(ctx, created.ID); err == nil {
+		t.Fatal("Get returned nil error for deleted todo")
 	}
 }
 
 func TestStoreRejectsEmptyTitle(t *testing.T) {
-	store := NewStore()
+	store := NewMemoryStore()
 
-	if _, err := store.Create("   "); err == nil {
+	if _, err := store.Create(context.Background(), "   "); err == nil {
 		t.Fatal("Create returned nil error for empty title")
 	}
 }

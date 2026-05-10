@@ -9,11 +9,11 @@ import (
 )
 
 type Handler struct {
-	store *Store
+	store Store
 	mux   *http.ServeMux
 }
 
-func NewHandler(store *Store) http.Handler {
+func NewHandler(store Store) http.Handler {
 	h := &Handler{
 		store: store,
 		mux:   http.NewServeMux(),
@@ -40,7 +40,13 @@ func (h *Handler) health(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) listTodos(w http.ResponseWriter, r *http.Request) {
-	writeJSON(w, http.StatusOK, h.store.List())
+	todos, err := h.store.List(r.Context())
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "could not list todos")
+		return
+	}
+
+	writeJSON(w, http.StatusOK, todos)
 }
 
 func (h *Handler) getTodo(w http.ResponseWriter, r *http.Request) {
@@ -50,9 +56,13 @@ func (h *Handler) getTodo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	todo, ok := h.store.Get(id)
-	if !ok {
+	todo, err := h.store.Get(r.Context(), id)
+	if errors.Is(err, ErrNotFound) {
 		writeError(w, http.StatusNotFound, ErrNotFound.Error())
+		return
+	}
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "could not get todo")
 		return
 	}
 
@@ -66,7 +76,7 @@ func (h *Handler) createTodo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	todo, err := h.store.Create(req.Title)
+	todo, err := h.store.Create(r.Context(), req.Title)
 	if err != nil {
 		writeError(w, http.StatusBadRequest, err.Error())
 		return
@@ -88,7 +98,7 @@ func (h *Handler) updateTodo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	todo, err := h.store.Update(id, req.Title, req.Completed)
+	todo, err := h.store.Update(r.Context(), id, req.Title, req.Completed)
 	if errors.Is(err, ErrNotFound) {
 		writeError(w, http.StatusNotFound, err.Error())
 		return
@@ -108,8 +118,11 @@ func (h *Handler) deleteTodo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !h.store.Delete(id) {
-		writeError(w, http.StatusNotFound, ErrNotFound.Error())
+	if err := h.store.Delete(r.Context(), id); errors.Is(err, ErrNotFound) {
+		writeError(w, http.StatusNotFound, err.Error())
+		return
+	} else if err != nil {
+		writeError(w, http.StatusInternalServerError, "could not delete todo")
 		return
 	}
 

@@ -9,7 +9,7 @@ import (
 )
 
 func TestTodoEndpoints(t *testing.T) {
-	handler := NewHandler(NewStore())
+	handler := NewHandler(NewMemoryStore())
 
 	createBody := bytes.NewBufferString(`{"title":"Write CRUD API"}`)
 	createReq := httptest.NewRequest(http.MethodPost, "/todos", createBody)
