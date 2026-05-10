@@ -1,0 +1,10 @@
+.git
+.github
+bin
+*.exe
+*.test
+.env
+.vscode
+.idea
+README.md
+LICENSE

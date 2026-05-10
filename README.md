@@ -6,6 +6,7 @@ A small Go HTTP API that exposes CRUD endpoints for an in-memory todo list.
 
 - Go 1.22 or newer
 - Git
+- Docker, optional for container runs
 
 ## Run
 
@@ -78,4 +79,30 @@ go test ./...
 
 ```powershell
 go build -o bin/go-language-app.exe ./cmd/go-language-app
+```
+
+## Docker
+
+Build the Docker image:
+
+```powershell
+docker build -t go-cli-app .
+```
+
+Run the container:
+
+```powershell
+docker run --rm -p 8080:8080 go-cli-app
+```
+
+Run on another host port:
+
+```powershell
+docker run --rm -p 9090:8080 go-cli-app
+```
+
+Then call the API:
+
+```powershell
+curl.exe http://localhost:8080/health
 ```
